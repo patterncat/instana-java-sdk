@@ -38,6 +38,11 @@ public class SpanSupport {
   public static final String SUPPRESS = "0";
 
   /**
+   * A trace id of value {@code 0} that indicates an inactive span.
+   */
+  public static final long VOID_ID = 0L;
+
+  /**
    * @return Indicates if a span for the current type is currently recorded. If the Instana agent is not active, this
    *         method always returns {@code false}.
    */
@@ -50,7 +55,7 @@ public class SpanSupport {
    *         is returned.
    */
   public static long currentTraceId(Span.Type type) {
-    return 0L;
+    return VOID_ID;
   }
 
   /**
@@ -58,7 +63,7 @@ public class SpanSupport {
    *         returned.
    */
   public static long currentSpanId(Span.Type type) {
-    return 0L;
+    return VOID_ID;
   }
 
   /**
@@ -94,15 +99,16 @@ public class SpanSupport {
 
   /**
    * Indicates to Instana that the subsequent {@link Span.Type#ENTRY} span should always be traced after receiving a
-   * request from another entity that has the supplied {@code traceId}.
+   * request from another entity that has the supplied {@code traceId}. The trace id must not be {@code 0}.
    */
   public static void inheritNext(long traceId) {
-    inheritNext(traceId, 0L);
+    inheritNext(traceId, VOID_ID);
   }
 
   /**
    * Indicates to Instana that the subsequent {@link Span.Type#ENTRY} span should always be traced after receiving a
-   * request from another entity that has the supplied {@code traceId} and {@code spanId}.
+   * request from another entity that has the supplied {@code traceId} and {@code spanId}. The trace id must not be
+   * {@code 0}.
    */
   public static void inheritNext(long traceId, long spanId) {
     /* empty */
@@ -130,7 +136,10 @@ public class SpanSupport {
     return first * 16 + second;
   }
 
-  public static void addTraceHeadersIfTracing(Span.Type type, Map<String, String> map) {
+  /**
+   * Adds all trace headers to the map. All values are rendered as {@link String}.
+   */
+  public static void addTraceHeadersIfTracing(Span.Type type, Map<? super String, ? super String> map) {
     if (isTracing(type)) {
       map.put(TRACE_ID, idAsString(currentTraceId(type)));
       map.put(SPAN_ID, idAsString(currentSpanId(type)));
