@@ -146,4 +146,12 @@ public class SpanSupport {
       map.put(LEVEL, "1");
     }
   }
+
+  public static void tag(Span.Type type, String tag) {
+    tag(type, tag, true);
+  }
+
+  public static void tag(Span.Type type, String tag, boolean override) {
+    /* do nothing */
+  }
 }
